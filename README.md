@@ -1,46 +1,60 @@
 # Iris Classification using Spark MLlib
-Assignment 1
 
-Overview
-________________________________________
+## Overview
 
-In this project, I performed a classification task on Iris dataset using Apache Spark MLlib. 
-The goal is to classify iris flower species based on sepal and petal measurements using machine learning algorithms.
+In this project, I performed a classification task on the Iris dataset using Apache Spark MLlib. The objective was to classify iris flower species based on sepal and petal measurements using machine learning algorithms.
 
 The Iris dataset contains 150 flower records with the following attributes:
+
 a) Sepal Length
 b) Sepal Width
 c) Petal Length
 d) Petal Width
 e) Species
 
-The dataset was loaded into a Spark DataFrame for preprocessing and machine learning tasks.
+The dataset was loaded into a Spark DataFrame and processed using Spark MLlib for machine learning analysis.
 
-Description of dataset and methodology
-_______________________________________
+## Description of Dataset and Methodology
 
 The workflow of this project includes:
 
-1. Data loading using SparkSession
-2. Data preprocessing (Duplicate checking)
-3. Splitting dataset into training and testing sets
-4. Training classification models:
-  a) Decision Tree
-  b) Random Forest
-  c) Logistic Regression
-5. Hyperparameter tuning using:
-  a) Cross-validation
-  b) Grid search
+1. Loading the Iris dataset using SparkSession.
+2. Data preprocessing:
+   * Duplicate checking and removal
+   * Missing value checking
+   * Label encoding using StringIndexer
+   * Feature vector creation using VectorAssembler
+3. Splitting the dataset into training and testing sets (80:20 ratio).
+4. Training three classification models:
+   * Decision Tree
+   * Random Forest
+   * Logistic Regression
+5. Hyperparameter tuning for all models using:
+   * Cross-validation
+   * Grid search
 6. Model evaluation using:
-  a) Accuracy
-  b) Precision
-  c) Recall
-  d) F1-score
+   * Accuracy
+   * Precision
+   * Recall
+   * F1-score
+7. Comparing model performance and identifying the best-performing classifier.
 
-Summary of results and key findings
-________________________________________________
+## Summary of Results and Key Findings
 
-In this project, three classification models were used. Decision Tree, Random Forest, and Logistic Regression. The models were tested using accuracy, precision, recall, and F1-score. The results show that Decision Tree and Random Forest gave the best performance with an accuracy of 95.83%. Logistic Regression gave lower performance with an accuracy of 79.17%. Then I run model tuning using cross-validation and grid search and applied to the Random Forest model. The tuned Random Forest model also gave strong and stable results, showing that it is the most suitable model for this dataset.
+Three classification models were developed and evaluated using accuracy, precision, recall, and F1-score. Hyperparameter tuning was applied to all models through cross-validation and grid search to improve performance.
 
-Overall, tree-based models performed better than Logistic Regression for the Iris dataset, and Spark MLlib worked well for building and testing machine learning classification models. 
+The results showed that the tree-based models, particularly Random Forest and Decision Tree, achieved the highest classification performance on the Iris dataset. Logistic Regression produced lower performance compared to the tree-based approaches.
 
+Among the evaluated models, Random Forest provided the most consistent and reliable results after hyperparameter tuning. Therefore, it was selected as the best-performing model for this classification task.
+
+Overall, the project demonstrates that Apache Spark MLlib provides an effective framework for implementing, tuning, and evaluating machine learning classification models on structured datasets.
+
+## Instructions to Reproduce the Analysis
+
+1. Install Apache Spark and PySpark.
+2. Download the Iris dataset and save it as `iris.csv`.
+3. Open the Jupyter Notebook containing the project code.
+4. Ensure the dataset file is located in the same directory as the notebook.
+5. Run all notebook cells from top to bottom.
+6. Review the evaluation metrics generated for Decision Tree, Random Forest, and Logistic Regression models.
+7. Compare the results to identify the best-performing model.
