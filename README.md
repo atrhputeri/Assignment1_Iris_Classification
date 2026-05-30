@@ -41,13 +41,13 @@ The workflow of this project includes:
 
 ## Summary of Results and Key Findings
 
-Three classification models were developed and evaluated using accuracy, precision, recall, and F1-score. Hyperparameter tuning was applied to all models through cross-validation and grid search to improve performance.
+Three classification models were developed and evaluated using accuracy, precision, recall, and F1-score. Hyperparameter tuning was done using cross-validation and grid search to improve model performance.
 
-The results showed that the tree-based models, particularly Random Forest and Decision Tree, achieved the highest classification performance on the Iris dataset. Logistic Regression produced lower performance compared to the tree-based approaches.
+The results show that Random Forest performed the best with 1.0 for all evaluation metrics. Decision Tree and Logistic Regression both achieved similar results with 95.83% accuracy, and their precision, recall, and F1-score are also the same.
 
-Among the evaluated models, Random Forest provided the most consistent and reliable results after hyperparameter tuning. Therefore, it was selected as the best-performing model for this classification task.
+Overall, Random Forest gave the best performance compared to the other two models based on the evaluation results. This shows that ensemble methods can give better results for this dataset.
 
-Overall, the project demonstrates that Apache Spark MLlib provides an effective framework for implementing, tuning, and evaluating machine learning classification models on structured datasets.
+In conclusion, Apache Spark MLlib is useful for building and testing machine learning models like classification in a simple and efficient way.
 
 ## Instructions to Reproduce the Analysis
 
