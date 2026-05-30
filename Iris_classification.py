@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
+# The Iris dataset contains 150 flower samples belonging to three species:
+# Setosa, Versicolor, and Virginica.
 
-# In[1]:
+# Each sample contains four numerical measurements:
+# sepal length, sepal width, petal length, and petal width.
+
+# The objective is to classify the species based on these measurements.
+# In[4]:
 
 
 # install pyspark
@@ -10,7 +16,7 @@
 get_ipython().system('pip install pyspark')
 
 
-# In[20]:
+# In[1]:
 
 
 # imports SparkSession from PySpark
@@ -18,15 +24,15 @@ get_ipython().system('pip install pyspark')
 from pyspark.sql import SparkSession
 
 
-# In[ ]:
+# In[4]:
 
 
 # Iris Classification using Spark MLlib
-# load the Iris dataset using SparkSession
-# This dataset contains 4 features and 1 target variable (species)
+# load the Iris dataset
+# the dataset contains 4 features (sepal length, sepal width, petal length and petal width) and 1 target (species)
 
 
-# In[21]:
+# In[3]:
 
 
 # show the table 
@@ -40,17 +46,18 @@ df.show()
 
 # ### Preprocess data 
 
-# In[60]:
+# In[4]:
 
 
 # data preprocessing
 # imports col function from PySpark
 # col is to refer to dataframe column
+# duplicate records were removed and missing values were checked.
 
 from pyspark.sql.functions import col
 
 
-# In[61]:
+# In[5]:
 
 
 # find duplicates 
@@ -61,7 +68,7 @@ df_duplicates = df.groupBy(df.columns).count().filter(col("count") > 1)
 df_duplicates.show()
 
 
-# In[24]:
+# In[6]:
 
 
 # drop the duplicate 
@@ -71,7 +78,7 @@ df_clean = df.dropDuplicates()
 df_clean.show()
 
 
-# In[25]:
+# In[7]:
 
 
 # check again to make sure duplicates have been remove
@@ -79,7 +86,7 @@ df_clean.show()
 df_clean.groupBy(df_clean.columns).count().filter("count > 1").show()
 
 
-# In[26]:
+# In[8]:
 
 
 # to count total value such as missing values or sum column
@@ -88,7 +95,7 @@ df_clean.groupBy(df_clean.columns).count().filter("count > 1").show()
 from pyspark.sql.functions import sum
 
 
-# In[49]:
+# In[9]:
 
 
 # to check if theres any null value in the data 
@@ -96,16 +103,7 @@ from pyspark.sql.functions import sum
 df_clean.select([sum(col(c).isNull().cast("int")).alias(c) for c in df_clean.columns]).show()
 
 
-# In[50]:
-
-
-# display dataset structure
-# data types
-
-df_clean.printSchema()
-
-
-# In[29]:
+# In[10]:
 
 
 # compare original data and cleaned data
@@ -114,7 +112,7 @@ print("Original:", df.count())
 print("Cleaned:", df_clean.count())
 
 
-# In[30]:
+# In[11]:
 
 
 # create label 
@@ -128,7 +126,7 @@ indexer = StringIndexer(inputCol="species", outputCol="label")
 df_clean = indexer.fit(df_clean).transform(df_clean)
 
 
-# In[31]:
+# In[12]:
 
 
 # create features
@@ -148,7 +146,7 @@ df_clean = assembler.transform(df_clean)
 
 # #### split dataset
 
-# In[32]:
+# In[13]:
 
 
 # splits the dataset into two parts
@@ -159,7 +157,7 @@ df_clean = assembler.transform(df_clean)
 train_data, test_data = df_clean.randomSplit([0.8, 0.2], seed=42)
 
 
-# In[33]:
+# In[14]:
 
 
 # verify split ratio and make sure data is divided properly 
@@ -167,239 +165,146 @@ train_data, test_data = df_clean.randomSplit([0.8, 0.2], seed=42)
 print("Training data:", train_data.count())
 print("Testing data:", test_data.count())
 
-1. Decision Tree
-# In[34]:
+
+# In[28]:
 
 
-# apply decision tree model
-# created using feature as input and label as target output 
-# The model is trained using train_data
-# after training, transform() is used to generate predictions on the test dataset
+# import classification algorithms from Spark MLlib
+# DecisionTreeClassifier: builds a tree-based model for classification
+# RandomForestClassifier: ensemble method using multiple decision trees
+# LogisticRegression: linear model used for classification problems
 
-from pyspark.ml.classification import DecisionTreeClassifier
+from pyspark.ml.classification import DecisionTreeClassifier, RandomForestClassifier, LogisticRegression
 
-dt = DecisionTreeClassifier(featuresCol="features", labelCol="label")
-
-dt_model = dt.fit(train_data)
-dt_predictions = dt_model.transform(test_data)
-
-2. Random Forest
-# In[62]:
-
-
-# import Random Forest classifier
-from pyspark.ml.classification import RandomForestClassifier
-
-# create Random Forest model (20 trees)
-rf = RandomForestClassifier(featuresCol="features", labelCol="label", numTrees=20)
-
-# train the model using training data
-rf_model = rf.fit(train_data)
-
-# make predictions on test data
-rf_predictions = rf_model.transform(test_data)
-
-3. Logistic Regression
-# In[63]:
-
-
-# import Logistic Regression classifier
-from pyspark.ml.classification import LogisticRegression
-
-# create Logistic Regression model
-lr = LogisticRegression(featuresCol="features", labelCol="label")
-
-# train the model using training data
-lr_model = lr.fit(train_data)
-
-# make predictions on test data
-lr_predictions = lr_model.transform(test_data)
-
-model tuning = trying different settings to get better accuracy.
-methods : cross validation & grid search 
-# In[40]:
-
-
-# import tools 
+# Import tools for model tuning
+# CrossValidator: performs cross-validation to evaluate model performance
+# ParamGridBuilder: creates a grid of hyperparameters for tuning
 
 from pyspark.ml.tuning import CrossValidator, ParamGridBuilder
+
+# Import evaluation metric tools
+# MulticlassClassificationEvaluator: evaluates classification models using metrics
+# such as accuracy, precision, recall, and F1-score
+
 from pyspark.ml.evaluation import MulticlassClassificationEvaluator
-from pyspark.ml.classification import RandomForestClassifier
 
 
-# In[41]:
+# In[29]:
 
 
-# import and create Random Forest classifier
-# featuresCol = input features used for prediction
-# labelCol = target output (species class)
-
-rf = RandomForestClassifier(featuresCol="features", labelCol="label")
-
-
-# In[42]:
-
-
-# now test using grid search 
-
-paramGrid = ParamGridBuilder() \
-    .addGrid(rf.numTrees, [10, 20]) \
-    .addGrid(rf.maxDepth, [5, 10]) \
-    .build()
-
-
-# In[64]:
-
-
-# import evaluation metric for classification
-# used to measure model performance (accuracy, F1, etc.)
+# Create evaluator 
+# labelCol is actual value
+# predictionCol is model output
+# metric used is accuracy
+# this will check how correct the prediction is
 
 evaluator = MulticlassClassificationEvaluator(
-    labelCol="label",            # actual values
-    predictionCol="prediction"   # predicted values
-)
-
-# CrossValidator performs model tuning using cross-validation (CV)
-# estimator = model to be trained (Random Forest)
-# estimatorParamMaps = grid search parameters
-# evaluator = performance measurement tool
-# numFolds = number of splits for cross-validation
-
-crossval = CrossValidator(
-    estimator=rf,
-    estimatorParamMaps=paramGrid,
-    evaluator=evaluator,
-    numFolds=3
+    labelCol="label",
+    predictionCol="prediction",
+    metricName="accuracy"
 )
 
 
-# In[65]:
+# In[30]:
 
 
-# train the model using CV
-# this will test different combinations
-# and select the best performing model
+# define models used for classification
+models = {
+    "Decision Tree": DecisionTreeClassifier(featuresCol="features", labelCol="label"),
+    "Random Forest": RandomForestClassifier(featuresCol="features", labelCol="label"),
+    "Logistic Regression": LogisticRegression(featuresCol="features", labelCol="label")
+}
 
-cv_model = crossval.fit(train_data)
+# define hyperparameter grid for each model
+# this is used for tuning the model to get better performance
+paramGrids = {
+    "Decision Tree": ParamGridBuilder()
+        .addGrid(models["Decision Tree"].maxDepth, [3, 5])
+        .addGrid(models["Decision Tree"].maxBins, [16, 32])
+        .build(),
 
+    "Random Forest": ParamGridBuilder()
+        .addGrid(models["Random Forest"].numTrees, [10, 20])
+        .addGrid(models["Random Forest"].maxDepth, [5, 10])
+        .build(),
 
-# In[66]:
+    "Logistic Regression": ParamGridBuilder()
+        .addGrid(models["Logistic Regression"].regParam, [0.01, 0.1])
+        .addGrid(models["Logistic Regression"].elasticNetParam, [0.0, 0.5])
+        .build()
+}
 
 
-# generate predictions using the best tuned model
-# applies the trained CV model on test data
+# In[31]:
 
-predictions = cv_model.transform(test_data)
 
+# Training and tuning
 
-# In[54]:
 
+# store results for all models
+results = {}
 
-# Calc accuracy of the model 
+# loop through each model (Decision Tree, Random Forest, Logistic Regression)
+for name in models:
 
-accuracy = evaluator.setMetricName("accuracy").evaluate(predictions)
-print("Accuracy:", accuracy)
+    print("\n====================")
+    print(name)
+    print("====================")
 
 
-# In[55]:
+    # apply cross validation with hyperparameter tuning
+    # this will try different parameter combinations from paramGrids
+    crossval = CrossValidator(
+        estimator=models[name],
+        estimatorParamMaps=paramGrids[name],
+        evaluator=evaluator,
+        numFolds=3
+    )
 
+    # train model using training data
+    cv_model = crossval.fit(train_data)
 
-# calculate precision of the model
-# means how many predicted values are actually correct
+    # test model using test data
+    predictions = cv_model.transform(test_data)
 
-precision = evaluator.setMetricName("weightedPrecision").evaluate(predictions)
-print("Precision:", precision)
+    # evaluate model performance
+    accuracy = evaluator.setMetricName("accuracy").evaluate(predictions)
+    precision = evaluator.setMetricName("weightedPrecision").evaluate(predictions)
+    recall = evaluator.setMetricName("weightedRecall").evaluate(predictions)
+    f1 = evaluator.setMetricName("f1").evaluate(predictions)
 
+    # store results for comparison later
+    results[name] = {
+        "accuracy": accuracy,
+        "precision": precision,
+        "recall": recall,
+        "f1": f1
+    }
 
-# In[56]:
+    # print results for each model
+    print("Accuracy:", accuracy)
+    print("Precision:", precision)
+    print("Recall:", recall)
+    print("F1:", f1)
 
+# 1. The Decision Tree model achieved an accuracy of 95.83%, which shows that it performs well in classifying the Iris dataset. However, there are still a small number of misclassifications, indicating that a single decision tree may not fully capture all patterns in the data.
+# 2. The Random Forest model achieved 100% accuracy, precision, recall, and F1-score, which indicates perfect classification on this dataset. This shows that ensemble learning improves performance by combining multiple decision trees and reducing errors. However, such perfect results may also suggest that the Iris dataset is very simple or easily separable.
+# 3. Logistic Regression achieved 95.83% accuracy, which is similar to the Decision Tree model. This indicates that linear classification works reasonably well for this dataset. However, it performs slightly worse than Random Forest, suggesting that non-linear relationships in the data are better captured by tree-based models.
+# In[32]:
 
-# Recall
-# = how many actual correct values were successfully predicted
 
-recall = evaluator.setMetricName("weightedRecall").evaluate(predictions)
-print("Recall:", recall)
+# compare result
 
+# import pandas library for creating table format
+import pandas as pd
 
-# In[57]:
+# convert results dictionary into a dataframe
+# .T is used to transpose
+results_df = pd.DataFrame(results).T
 
+# display final comparison table of all models
+print(results_df)
 
-# F1 score
-# balance between precision and recall
-# it shows overall model performance in one value
-
-f1 = evaluator.setMetricName("f1").evaluate(predictions)
-print("F1 Score:", f1)
-
-
-# In[67]:
-
-
-# function to evaluate a model's performance
-
-def evaluate_model(pred, name):
-    print("\n", name)
-    print("Accuracy:", evaluator.setMetricName("accuracy").evaluate(pred))
-    print("Precision:", evaluator.setMetricName("weightedPrecision").evaluate(pred))
-    print("Recall:", evaluator.setMetricName("weightedRecall").evaluate(pred))
-    print("F1:", evaluator.setMetricName("f1").evaluate(pred))
-
-
-# In[69]:
-
-
-# compares Decision Tree, Random Forest, Logistic Regression,
-
-evaluate_model(dt_predictions, "Decision Tree")
-evaluate_model(rf_predictions, "Random Forest")
-evaluate_model(lr_predictions, "Logistic Regression")
-evaluate_model(predictions, "Tuned Random Forest")
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
-
-# In[ ]:
-
-
-
-
+#The table above shows the performance of the three classification models evaluated using accuracy, precision, recall, and F1-score.
+#In conclusion, Random Forest is the best model for this dataset because it achieved perfect scores in all evaluation metrics. Decision Tree and Logistic Regression performed similarly but slightly lower. This suggests that ensemble learning methods are more suitable for this classification problem. 
+#The results also indicate that the Iris dataset is well-structured and easily separable, which allows high performance from classical machine learning models.
