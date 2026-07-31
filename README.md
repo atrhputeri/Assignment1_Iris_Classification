@@ -1,60 +1,55 @@
-# Iris Classification using Spark MLlib
+# Iris Species Classification Using PySpark MLlib
 
-## Overview
+## Project Overview
 
-In this project, I performed a classification task on the Iris dataset using Apache Spark MLlib. The objective was to classify iris flower species based on sepal and petal measurements using machine learning algorithms.
+This project applies a machine learning classification workflow using **PySpark MLlib** to classify Iris flower species based on their physical measurements.
 
-The Iris dataset contains 150 flower records with the following attributes:
+The project includes data cleaning, preprocessing, feature preparation, model training, hyperparameter tuning, evaluation, and comparison of three classification algorithms:
 
-a) Sepal Length
-b) Sepal Width
-c) Petal Length
-d) Petal Width
-e) Species
+- Decision Tree
+- Random Forest
+- Logistic Regression
 
-The dataset was loaded into a Spark DataFrame and processed using Spark MLlib for machine learning analysis.
+The models are trained to predict the species of Iris flowers:
+- Setosa
+- Versicolor
+- Virginica
 
-## Description of Dataset and Methodology
+---
 
-The workflow of this project includes:
+# Dataset
 
-1. Loading the Iris dataset using SparkSession.
-2. Data preprocessing:
-   * Duplicate checking and removal
-   * Missing value checking
-   * Label encoding using StringIndexer
-   * Feature vector creation using VectorAssembler
-3. Splitting the dataset into training and testing sets (80:20 ratio).
-4. Training three classification models:
-   * Decision Tree
-   * Random Forest
-   * Logistic Regression
-5. Hyperparameter tuning for all models using:
-   * Cross-validation
-   * Grid search
-6. Model evaluation using:
-   * Accuracy
-   * Precision
-   * Recall
-   * F1-score
-7. Comparing model performance and identifying the best-performing classifier.
+The dataset used in this project is the **Iris dataset**, provided in the repository. 
 
-## Summary of Results and Key Findings
+The dataset contains 150 original records with the following features:
 
-Three classification models were developed and evaluated using accuracy, precision, recall, and F1-score. Hyperparameter tuning was done using cross-validation and grid search to improve model performance.
+| Feature | Description |
+|---|---|
+| sepal_length | Length of sepal |
+| sepal_width | Width of sepal |
+| petal_length | Length of petal |
+| petal_width | Width of petal |
+| species | Iris flower species (target variable) |
 
-The results show that Random Forest performed the best with 1.0 for all evaluation metrics. Decision Tree and Logistic Regression both achieved similar results with 95.83% accuracy, and their precision, recall, and F1-score are also the same.
+The target variable (`species`) contains three classes:
 
-Overall, Random Forest gave the best performance compared to the other two models based on the evaluation results. This shows that ensemble methods can give better results for this dataset.
+- Setosa
+- Versicolor
+- Virginica
 
-In conclusion, Apache Spark MLlib is useful for building and testing machine learning models like classification in a simple and efficient way.
+The dataset is loaded directly from the CSV file into a Spark DataFrame during the notebook execution.
 
-## Instructions to Reproduce the Analysis
+---
 
-1. Install Apache Spark and PySpark.
-2. Download the Iris dataset and save it as `iris.csv`.
-3. Open the Jupyter Notebook containing the project code.
-4. Ensure the dataset file is located in the same directory as the notebook.
-5. Run all notebook cells from top to bottom.
-6. Review the evaluation metrics generated for Decision Tree, Random Forest, and Logistic Regression models.
-7. Compare the results to identify the best-performing model.
+# Requirements
+The project requires:
+
+- Python 3.x
+- Jupyter Notebook
+- Apache Spark
+- PySpark
+
+Install required libraries:
+
+```bash
+pip install pyspark pandas matplotlib
